@@ -6,61 +6,74 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial;
-      background: #0f172a;
+      font-family: system-ui, Arial;
+      background: #0b1220;
       color: white;
     }
 
-    /* Top bar */
     .topbar {
-      background: #111827;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
+      background: #0f172a;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      border-bottom: 1px solid #1f2937;
     }
 
-    /* Chat screen */
     .chat {
       height: calc(100vh - 140px);
       padding: 20px;
       overflow-y: auto;
     }
 
-    /* Message box */
     .msg {
-      background: #1f2937;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
       margin-bottom: 10px;
       max-width: 70%;
+      line-height: 1.4;
+      font-size: 15px;
+      word-wrap: break-word;
     }
 
-    /* Input bar */
+    .user {
+      margin-left: auto;
+      background: #2563eb;
+      color: white;
+    }
+
+    .bot {
+      background: #1f2937;
+    }
+
     .inputbar {
       position: fixed;
       bottom: 0;
       width: 100%;
       display: flex;
-      padding: 10px;
-      background: #111827;
+      gap: 10px;
+      padding: 12px;
+      background: #0f172a;
+      border-top: 1px solid #1f2937;
     }
 
     input {
       flex: 1;
-      padding: 15px;
-      font-size: 16px;
+      padding: 14px;
+      font-size: 15px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      outline: none;
+      background: #111827;
+      color: white;
     }
 
     button {
-      margin-left: 10px;
-      padding: 15px 20px;
-      font-size: 16px;
+      padding: 14px 18px;
+      font-size: 15px;
       background: #3b82f6;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
     }
 
@@ -75,7 +88,7 @@
   <div class="topbar">📚 AI Study Assistant (Class 8)</div>
 
   <div class="chat" id="chat">
-    <div class="msg">Hello! Ask me anything 😊</div>
+    <div class="msg bot">Hello! Ask me anything 😊</div>
   </div>
 
   <div class="inputbar">
@@ -84,26 +97,49 @@
   </div>
 
   <script>
-    function ask() {
+    async function ask() {
       let q = document.getElementById("q").value;
-
       let chat = document.getElementById("chat");
 
-      // user message
-      chat.innerHTML += `<div class="msg" style="margin-left:auto;background:#2563eb;">${q}</div>`;
+      if (!q) return;
 
-      // simple AI reply (for now)
-      let answer = "I don't know yet 😅";
-
-      if (q.includes("2+2")) answer = "4";
-      if (q.includes("capital of india")) answer = "New Delhi";
-
-      chat.innerHTML += `<div class="msg">${answer}</div>`;
+      // show user message
+      chat.innerHTML += `<div class="msg user">${q}</div>`;
 
       document.getElementById("q").value = "";
+
+      // loading message
+      let loading = document.createElement("div");
+      loading.className = "msg bot";
+      loading.innerText = "Thinking...";
+      chat.appendChild(loading);
+
       chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const res = await fetch("/api/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ question: q })
+        });
+
+        const data = await res.json();
+
+        loading.remove();
+
+        let answer = data.answer || "No response";
+
+        chat.innerHTML += `<div class="msg bot">${answer}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+
+      } catch (err) {
+        loading.remove();
+        chat.innerHTML += `<div class="msg bot">Error connecting to server</div>`;
+      }
     }
   </script>
 
 </body>
-</html>
+</html>                
