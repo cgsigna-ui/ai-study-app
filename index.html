@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Study Chat</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+    }
+
+    /* Top bar */
+    .topbar {
+      background: #111827;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* Chat screen */
+    .chat {
+      height: calc(100vh - 140px);
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* Message box */
+    .msg {
+      background: #1f2937;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      max-width: 70%;
+    }
+
+    /* Input bar */
+    .inputbar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      padding: 10px;
+      background: #111827;
+    }
+
+    input {
+      flex: 1;
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 15px 20px;
+      font-size: 16px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">📚 AI Study Assistant (Class 8)</div>
+
+  <div class="chat" id="chat">
+    <div class="msg">Hello! Ask me anything 😊</div>
+  </div>
+
+  <div class="inputbar">
+    <input id="q" placeholder="Type your question..." />
+    <button onclick="ask()">Send</button>
+  </div>
+
+  <script>
+    function ask() {
+      let q = document.getElementById("q").value;
+
+      let chat = document.getElementById("chat");
+
+      // user message
+      chat.innerHTML += `<div class="msg" style="margin-left:auto;background:#2563eb;">${q}</div>`;
+
+      // simple AI reply (for now)
+      let answer = "I don't know yet 😅";
+
+      if (q.includes("2+2")) answer = "4";
+      if (q.includes("capital of india")) answer = "New Delhi";
+
+      chat.innerHTML += `<div class="msg">${answer}</div>`;
+
+      document.getElementById("q").value = "";
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
