@@ -39,9 +39,6 @@ export default async function handler(req, res) {
 
     res.status(200).json({ answer });
 
-  } catch (error) {
-    res.status(500).json({
-      answer: "Error connecting to AI"
     });
   }
 }
