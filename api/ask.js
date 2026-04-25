@@ -6,21 +6,31 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ answer: "Ask something first" });
     }
 
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/google/flan-t5-base",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.HF_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          inputs: `Answer simply: ${question}`
-        })
-      }
-    );
+    async function callAI() {
+      return await fetch(
+        "https://api-inference.huggingface.co/models/google/flan-t5-base",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.HF_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            inputs: question
+          })
+        }
+      );
+    }
 
-    const data = await response.json();
+    let response = await callAI();
+    let data = await response.json();
+
+    // 🔁 retry once if failed
+    if (data?.error || !data) {
+      await new Promise(r => setTimeout(r, 2000));
+      response = await callAI();
+      data = await response.json();
+    }
 
     let answer = "";
 
@@ -28,17 +38,12 @@ module.exports = async function handler(req, res) {
       answer = data[0].generated_text;
     } else if (data?.generated_text) {
       answer = data.generated_text;
-    } else if (data?.error) {
-      answer = "AI is busy... try again in 5–10 seconds.";
     } else {
-      answer = "No response, please retry.";
+      answer = "AI is busy right now — try again in a few seconds.";
     }
 
     res.status(200).json({ answer });
 
-  } catch (error) {
-    res.status(500).json({
-      answer: "Server error connecting to AI"
     });
   }
 };
